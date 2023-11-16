@@ -142,17 +142,17 @@ exports.forgotPassword = async (req, res) => {
 
   try {
     // Find the user by email
-    const user = await Admin.findOne({ where: { email } });
-    if (!user) {
+    const admin = await Admin.findOne({ where: { email } });
+    if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
 
     // Hash the new password
     const hashedPassword = await hashPassword(password);
 
-    // Update the user's password
-    await user.update({ password: hashedPassword });
-    res.status(200).json({ message: 'Password reset successfully', data: user });
+    // Update the admin's password
+    await admin.update({ password: hashedPassword });
+    res.status(200).json({ message: 'Password reset successfully', data: admin });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
