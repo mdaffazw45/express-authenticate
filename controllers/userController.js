@@ -134,12 +134,6 @@ exports.forgotPassword = async (req, res) => {
   const { email } = req.params; // Use email from req.params
   const { password } = req.body;
 
-  const { error } = userSchema.validate({ password });
-
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
   try {
     // Find the user by email
     const user = await User.findOne({ where: { email } });

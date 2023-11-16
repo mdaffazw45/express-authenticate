@@ -136,32 +136,26 @@ exports.deleteAdmin = async (req, res) => {
   }
 };
 
-
 exports.forgotPassword = async (req, res) => {
   const { email } = req.params; // Use email from req.params
   const { password } = req.body;
 
-  const { error } = adminSchema.validate({ password });
-
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
   try {
-    // Find the admin by email
-    const admin = await Admin.findOne({ where: { email } });
-    if (!admin) {
+    // Find the user by email
+    const user = await Admin.findOne({ where: { email } });
+    if (!user) {
       return res.status(404).json({ message: 'Admin not found' });
     }
 
     // Hash the new password
     const hashedPassword = await hashPassword(password);
 
-    // Update the admin's password
-    await admin.update({ password: hashedPassword });
-    res.status(200).json({ message: 'Password reset successfully', data: admin });
+    // Update the user's password
+    await user.update({ password: hashedPassword });
+    res.status(200).json({ message: 'Password reset successfully', data: user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
