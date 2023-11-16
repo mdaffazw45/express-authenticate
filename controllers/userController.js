@@ -1,7 +1,7 @@
 const { User } = require('../models'); // Assuming you have a User model
 const { userSchema } = require('../helpers/validateAttribute'); // Your Joi validation schema
 const { comparePasswords, hashPassword  } = require('../utils/bcrypt'); // Import the comparePasswords function
-const generateAuthToken = require('../utils/generateAuthToken'); // Import the generateAuthToken function
+const {generateUserAuthToken } = require('../utils/generateAuthToken'); // Import the generateAuthToken function
 
 
 // Controller methods for user-related operations
@@ -52,7 +52,7 @@ exports.registerUser = async (req, res) => {
     const newUser = await User.create({ firstName , lastName , email , phoneNumber, password : hashedPassword });
 
     // Generate a JWT token for the newly registered user
-    const token = generateAuthToken(newUser);
+    const token = generateUserAuthToken(newUser);
 
     res.status(201).json({ message: 'User registered successfully', token, data: newUser });
   } catch (error) {
@@ -78,7 +78,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate and send a JWT token
-    const token = generateAuthToken(user);
+    const token = generateUserAuthToken(user);
     res.status(200).json({ message: 'Authentication successful', token });
   } catch (error) {
     console.error(error);

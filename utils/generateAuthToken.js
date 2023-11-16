@@ -1,17 +1,31 @@
 const jwt = require('jsonwebtoken');
 
-// Function to generate a JWT token for both User and Admin
-const generateAuthToken = (userOrAdmin) => {
+// Function to generate a JWT token for Users
+const generateUserAuthToken = (user) => {
   const payload = {
-    id: userOrAdmin.id,
-    email: userOrAdmin.email,
+    id: user.id,
+    email: user.email,
     // Add any other user-related data you want to include in the token
   };
 
-  // Sign the token with your secret key and set an expiration time (e.g., 1 hour)
-  const token = jwt.sign(payload, 'SECRET-KEY', { expiresIn: '1h' });
+  // Sign the token with the user secret key and set an expiration time (e.g., 30 minutes)
+  const token = jwt.sign(payload, 'USER-SECRET-KEY', { expiresIn: '30m' });
 
   return token;
 };
 
-module.exports = generateAuthToken;
+// Function to generate a JWT token for Admins
+const generateAdminAuthToken = (admin) => {
+  const payload = {
+    id: admin.id,
+    email: admin.email,
+    // Add any other admin-related data you want to include in the token
+  };
+
+  // Sign the token with the admin secret key and set an expiration time (e.g., 30 minutes)
+  const token = jwt.sign(payload, 'ADMIN-SECRET-KEY', { expiresIn: '30m' });
+
+  return token;
+};
+
+module.exports = { generateUserAuthToken, generateAdminAuthToken };

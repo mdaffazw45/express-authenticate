@@ -1,6 +1,6 @@
 const { Admin } = require('../models'); // Assuming you have an Admin model
 const { adminSchema } = require('../helpers/validateAttribute'); // Your Joi validation schema for admins
-const generateAuthToken = require('../utils/generateAuthToken'); // Import the generateAuthToken function
+const {generateAdminAuthToken} = require('../utils/generateAuthToken'); // Import the generateAuthToken function
 const { comparePasswords, hashPassword  } = require('../utils/bcrypt'); // Import the comparePasswords function
 
 
@@ -57,7 +57,7 @@ exports.registerAdmin = async (req, res) => {
       password: hashedPassword, // Use the hashed password here
     });
 
-    const token = generateAuthToken(newAdmin);
+    const token = generateAdminAuthToken(newAdmin);
 
     res.status(201).json({ message: 'Admin registered successfully', token, data: newAdmin });
   } catch (error) {
@@ -85,7 +85,7 @@ exports.loginAdmin = async (req, res) => {
     }
 
     // Generate and send a JWT token
-    const token = generateAuthToken(admin);
+    const token = generateAdminAuthToken(admin);
     res.status(200).json({ message: 'Authentication successful', token });
   } catch (error) {
     console.error(error);
