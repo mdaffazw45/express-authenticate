@@ -9,7 +9,7 @@ const generateAuthToken = (userOrAdmin) => {
   };
 
   // Sign the token with your secret key and set an expiration time (e.g., 1 hour)
-  const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });
+  const token = jwt.sign(payload, 'SECRET-KEY', { expiresIn: '1h' });
 
   return token;
 };

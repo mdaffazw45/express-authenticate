@@ -1,6 +1,7 @@
 const { User } = require('../models'); // Assuming you have a User model
 const { userSchema } = require('../helpers/validateAttribute'); // Your Joi validation schema
 const { comparePasswords, hashPassword  } = require('../utils/bcrypt'); // Import the comparePasswords function
+const generateAuthToken = require('../utils/generateAuthToken'); // Import the generateAuthToken function
 
 
 // Controller methods for user-related operations
