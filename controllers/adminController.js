@@ -83,9 +83,15 @@ exports.loginAdmin = async (req, res) => {
     if (!isPasswordMatch) {
       return res.status(401).json({ message: 'Authentication failed. Incorrect password' });
     }
-
+    console.log(admin.id , 'Admin')
+    let modifiedAdmin = {
+      id: admin.id,
+      email: admin.email,
+      user_type:'admin'
+    }
     // Generate and send a JWT token
-    const token = generateAdminAuthToken(admin);
+    console.log(modifiedAdmin , 'modifiedAdmin')
+    const token = generateAdminAuthToken(modifiedAdmin);
     res.status(200).json({ message: 'Authentication successful', token });
   } catch (error) {
     console.error(error);

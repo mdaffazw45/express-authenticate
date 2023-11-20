@@ -76,9 +76,13 @@ exports.loginUser = async (req, res) => {
     if (!isPasswordMatch) {
       return res.status(401).json({ message: 'Authentication failed. Incorrect password' });
     }
-
+    let modifiedUser = {
+      id: user.id,
+      email: user.email,
+      user_type:'user'
+    }
     // Generate and send a JWT token
-    const token = generateUserAuthToken(user);
+    const token = generateUserAuthToken(modifiedUser);
     res.status(200).json({ message: 'Authentication successful', token });
   } catch (error) {
     console.error(error);

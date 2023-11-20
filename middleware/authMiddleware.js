@@ -1,60 +1,66 @@
 const jwt = require('jsonwebtoken');
 const { User, Admin } = require('../models'); // Import your User and Admin models
 
-const authenticateUser = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
   try {
-    const token = req.header('Authorization');
+    let token = req.header('Authorization');
+
+    console.log(token, 'Ini Token');
 
     if (!token) {
-      return res.status(401).json({ message: 'User authentication failed. Token missing' });
+      return res.status(401).json({ message: 'Authentication failed. Token missing' });
     }
 
-    // Verify the token and decode the payload
-    const decoded = jwt.verify(token, 'USER-SECRET-KEY'); // Replace with your user JWT secret key
+    // Remove "Bearer " prefix from the token
+    token = token.replace('Bearer ', ''); // Remove the "Bearer " prefix if present
 
-    // Check if the user exists in the User model
-    const user = await User.findByPk(decoded.id);
+    console.log(token, 'Ini Token 22');
 
-    if (!user) {
-      return res.status(401).json({ message: 'User authentication failed. User not found' });
+    // Determine the secret key based on the token
+    const decoded = jwt.decode(token); // Decoding the token to access its payload
+
+    console.log(decoded , 'decoded')
+
+    if (!decoded) {
+      return res.status(401).json({ message: 'Authentication failed. Invalid token' });
     }
 
-    // Attach the authenticated user object to the request for use in protected user routes
-    req.authenticatedUser = user;
+    if (decoded.user_type === 'user') {
+      secretKey = 'USER-SECRET-KEY';
+    } else if (decoded.user_type === 'admin') {
+      secretKey = 'ADMIN-SECRET-KEY';
+    } else {
+      return res.status(401).json({ message: 'Authentication failed. Invalid user type' });
+    }
 
-    next();
+    // Verify the token using the determined secret key
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: 'Authentication failed. Invalid token' });
+      }
+
+      // Check if the user or admin exists based on the secret key
+      let authenticatedEntity;
+
+      if (secretKey === 'USER-SECRET-KEY') {
+        authenticatedEntity = User.findByPk(decoded.id);
+      } else if (secretKey === 'ADMIN-SECRET-KEY') {
+        authenticatedEntity = Admin.findByPk(decoded.id);
+      }
+
+      if (!authenticatedEntity) {
+        return res.status(401).json({ message: 'Authentication failed. User/Admin not found' });
+      }
+
+      // Attach the authenticated user or admin object to the request for use in protected routes
+      req.authenticatedUser = authenticatedEntity;
+
+      next();
+    });
   } catch (error) {
     console.error(error);
-    res.status(401).json({ message: 'User authentication failed. Invalid token' });
+    res.status(401).json({ message: 'Authentication failed. Invalid token' });
   }
 };
 
-const authenticateAdmin = async (req, res, next) => {
-  try {
-    const token = req.header('Authorization');
-
-    if (!token) {
-      return res.status(401).json({ message: 'Admin authentication failed. Token missing' });
-    }
-
-    // Verify the token and decode the payload
-    const decoded = jwt.verify(token, 'ADMIN-SECRET-KEY'); // Replace with your admin JWT secret key
-
-    // Check if the admin exists in the Admin model
-    const admin = await Admin.findByPk(decoded.id);
-
-    if (!admin) {
-      return res.status(401).json({ message: 'Admin authentication failed. Admin not found' });
-    }
-
-    // Attach the authenticated admin object to the request for use in protected admin routes
-    req.authenticatedAdmin = admin;
-
-    next();
-  } catch (error) {
-    console.error(error);
-    res.status(401).json({ message: 'Admin authentication failed. Invalid token' });
-  }
-};
-
-module.exports = { authenticateUser, authenticateAdmin };
+module.exports = authenticate;
